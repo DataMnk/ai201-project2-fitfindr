@@ -2,14 +2,13 @@
 app.py
 
 Gradio interface for FitFindr. The layout and wiring are already set up —
-your job is to fill in handle_query() so it calls run_agent() and maps
-the session results to the three output panels.
+handle_query() calls run_agent() and maps the session results to the three
+output panels.
 
 Run with:
     python app.py
 
-Then open the localhost URL shown in your terminal (usually http://localhost:7860,
-but check your terminal — the port may differ).
+Then open the localhost URL shown in your terminal.
 """
 
 import gradio as gr
@@ -25,26 +24,46 @@ def handle_query(user_query: str, wardrobe_choice: str) -> tuple[str, str, str]:
     Called by Gradio when the user submits a query.
 
     Args:
-        user_query:     The text the user typed into the search box.
+        user_query:      The text the user typed into the search box.
         wardrobe_choice: Either "Example wardrobe" or "Empty wardrobe (new user)".
 
     Returns:
-        A tuple of three strings:
+        A tuple of three strings mapped to the three output panels:
             (listing_text, outfit_suggestion, fit_card)
-        Each string maps to one of the three output panels in the UI.
-
-    TODO:
-        1. Guard against an empty query (return early with an error message).
-        2. Select the wardrobe based on wardrobe_choice.
-        3. Call run_agent() with the query and selected wardrobe.
-        4. If session["error"] is set, return the error in the first panel
-           and empty strings for the other two.
-        5. Otherwise, format session["selected_item"] into a readable listing_text
-           string and return it along with session["outfit_suggestion"] and
-           session["fit_card"].
     """
-    # TODO: implement this function
-    return "Agent not yet implemented.", "", ""
+
+    # Step 1: Guard against empty query
+    if not user_query or not user_query.strip():
+        return "Please enter a search query.", "", ""
+
+    # Step 2: Select the wardrobe based on the radio button choice
+    if wardrobe_choice == "Empty wardrobe (new user)":
+        wardrobe = get_empty_wardrobe()
+    else:
+        wardrobe = get_example_wardrobe()
+
+    # Step 3: Run the agent planning loop
+    session = run_agent(query=user_query, wardrobe=wardrobe)
+
+    # Step 4: If the agent hit an error (e.g. no listings found), show it in
+    # the first panel and leave the other two empty
+    if session["error"]:
+        return session["error"], "", ""
+
+    # Step 5: Format the selected listing into a readable string for the first panel
+    item = session["selected_item"]
+    listing_text = (
+        f"📦 {item['title']}\n\n"
+        f"💰 Price: ${item['price']}\n"
+        f"🏪 Platform: {item['platform'].capitalize()}\n"
+        f"📏 Size: {item['size']}\n"
+        f"✨ Condition: {item['condition'].capitalize()}\n"
+        f"🎨 Colors: {', '.join(item['colors'])}\n"
+        f"🏷️ Style: {', '.join(item['style_tags'])}\n\n"
+        f"{item['description']}"
+    )
+
+    return listing_text, session["outfit_suggestion"], session["fit_card"]
 
 
 # ── interface ─────────────────────────────────────────────────────────────────
@@ -121,3 +140,18 @@ Describe what you're looking for — include size and price if you want to filte
 if __name__ == "__main__":
     demo = build_interface()
     demo.launch()
+
+
+# =============================================================================
+# ORIGINAL STARTER INSTRUCTIONS (preserved for reference)
+# =============================================================================
+#
+# TODO:
+#     1. Guard against an empty query (return early with an error message).
+#     2. Select the wardrobe based on wardrobe_choice.
+#     3. Call run_agent() with the query and selected wardrobe.
+#     4. If session["error"] is set, return the error in the first panel
+#        and empty strings for the other two.
+#     5. Otherwise, format session["selected_item"] into a readable listing_text
+#        string and return it along with session["outfit_suggestion"] and
+#        session["fit_card"].
