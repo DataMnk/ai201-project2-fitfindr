@@ -207,34 +207,3 @@ if __name__ == "__main__":
     )
     print(f"Error message: {session2['error']}")
     print(f"fit_card is None: {session2['fit_card'] is None}")
-
-
-# =============================================================================
-# ORIGINAL STARTER INSTRUCTIONS (preserved for reference)
-# =============================================================================
-#
-# TODO — implement run_agent() using the planning loop you designed in planning.md:
-#
-#     Step 1: Initialize the session with _new_session().
-#
-#     Step 2: Parse the user's query to extract a description, size, and
-#             max_price. You can use regex, string splitting, or ask the LLM
-#             to parse it — document your choice in planning.md.
-#             Store the result in session["parsed"].
-#
-#     Step 3: Call search_listings() with the parsed parameters.
-#             Store results in session["search_results"].
-#             If no results: set session["error"] to a helpful message and
-#             return the session early. Do NOT proceed to suggest_outfit
-#             with empty input.
-#
-#     Step 4: Select the item to use (e.g., the top result).
-#             Store it in session["selected_item"].
-#
-#     Step 5: Call suggest_outfit() with the selected item and wardrobe.
-#             Store the result in session["outfit_suggestion"].
-#
-#     Step 6: Call create_fit_card() with the outfit suggestion and selected item.
-#             Store the result in session["fit_card"].
-#
-#     Step 7: Return the session.
